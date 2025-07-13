@@ -1,0 +1,144 @@
+// Fetch and parse CSV, then render chart
+const CSV_URL = "./assets/data.csv";
+const chartRanges = {
+  "1m": 30,
+  "1y": 365,
+  "5y": 365 * 5,
+  "10y": 365 * 10,
+  all: Infinity,
+};
+let rawData = [];
+let chart;
+
+async function fetchCSV(url) {
+  const res = await fetch(url);
+  const text = await res.text();
+  return text;
+}
+
+// Parse CSV text into structured data
+// Assumes CSV has comment lines preceded by a # character, then a header row, then the data rows
+function parseCSV(text) {
+  const lines = text
+    .split("\n")
+    .filter((line) => !line.startsWith("#") && line.trim());
+  const columnHeaders = lines[0].split(",");
+  const data = [];
+  // Iterate over each line after the header, creating an object for each row with properties based on column headers
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",");
+    if (cols.length !== columnHeaders.length) continue; // Skip malformed rows
+    const row = {};
+    for (let j = 0; j < columnHeaders.length; j++) {
+      row[columnHeaders[j]] = cols[j] ? cols[j].trim() : null;
+    }
+    data.push(row);
+  }
+  return data;
+}
+
+function filterDataByRange(data, rangeKey) {
+  if (rangeKey === "all") return data;
+  const days = chartRanges[rangeKey];
+  const endDate = new Date(data[data.length - 1].date);
+  const startDate = new Date(endDate);
+  startDate.setDate(endDate.getDate() - days);
+  return data.filter((row) => new Date(row.date) >= startDate);
+}
+
+function renderChart(data, rangeKey) {
+  const ctx = document.getElementById("lake-chart").getContext("2d");
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: data.map((row) => row.date),
+      datasets: [
+        {
+          label: "Percent Full",
+          data: data.map((row) => {
+            const {
+              reservoir_storage,
+              conservation_capacity,
+              dead_pool_capacity,
+            } = row;
+            const reservoir = Number(reservoir_storage);
+            const conservation = Number(conservation_capacity);
+            const deadPool = Number(dead_pool_capacity);
+            return ((reservoir - deadPool) / conservation) * 100;
+          }),
+          borderColor: "#1976d2",
+          backgroundColor: "rgba(25, 118, 210, 0.1)",
+          fill: true,
+          pointRadius: 0,
+          borderWidth: 2,
+          tension: 0.1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          type: "time",
+          time: {
+            unit: rangeKey === "1m" ? "day" : "month",
+            tooltipFormat: "yyyy-MM-dd",
+          },
+          title: {
+            display: false,
+          },
+        },
+        y: {
+          min: 0,
+          suggestedMax: 100, // prefer a max of 100%, but allow autoscaling
+          title: {
+            display: false,
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          mode: "index",
+          intersect: false,
+          callbacks: {
+            label: function (context) {
+              const value = context.parsed.y.toFixed(2);
+              return `Percent full: ${value}%`;
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+function setActiveButton(rangeKey) {
+  document.querySelectorAll(".controls button").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.range === rangeKey);
+  });
+}
+
+async function init() {
+  const csvText = await fetchCSV(CSV_URL);
+  rawData = parseCSV(csvText);
+  console.log("Raw data loaded:");
+  console.table(rawData.slice(-100)); // Log last 100 rows for debugging
+  let currentRange = "10y";
+  setActiveButton(currentRange);
+  renderChart(filterDataByRange(rawData, currentRange), currentRange);
+  document.querySelectorAll(".controls button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentRange = btn.dataset.range;
+      setActiveButton(currentRange);
+      renderChart(filterDataByRange(rawData, currentRange), currentRange);
+    });
+  });
+}
+
+window.addEventListener("DOMContentLoaded", init);

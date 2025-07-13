@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Is Lake Travis Full Yet?</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <nav class="controls">
+        <button data-range="1m">1 Month</button>
+        <button data-range="1y">1 Year</button>
+        <button data-range="5y">5 Years</button>
+        <button data-range="10y" class="active">10 Years</button>
+        <button data-range="all">All</button>
+      </nav>
+      <div id="chart-container">
+        <canvas id="lake-chart"></canvas>
+      </div>
+    </main>
+    <footer>
+      <p>
+        Data from
+        <a
+          href="https://waterdatafortexas.org/reservoirs/individual/travis"
+          target="_blank"
+          >Water Data for Texas</a
+        >
+      </p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>

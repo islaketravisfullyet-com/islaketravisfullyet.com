@@ -1,0 +1,58 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f5f7fa;
+    color: #222;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.controls {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.controls button {
+    background: #e3eafc;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.controls button.active {
+    background: #1976d2;
+    color: #fff;
+    font-weight: bold;
+}
+
+.controls button:hover:not(.active) {
+    background: #bbdefb;
+}
+
+#chart-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+footer {
+    position: absolute;
+    bottom: 4rem;
+    width: 100%;
+    text-align: center;
+    font-size: .75rem;
+    padding: .5rem;
+}
+
+footer p {
+    margin: 0;
+}
