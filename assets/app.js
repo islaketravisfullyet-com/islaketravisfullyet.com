@@ -1,5 +1,8 @@
-// Fetch and parse CSV, then render chart
 const CSV_URL = "./assets/data.csv";
+const PRIMARY_COLOR = "#239bcf";
+const ACCENT_COLOR = "#0791cc";
+const DEFAULT_RANGE = "10y"; // Default range to show on initial load
+
 const chartRanges = {
   "1m": 30,
   "1y": 365,
@@ -74,7 +77,7 @@ function renderChart(data, rangeKey) {
   if (chart) chart.destroy();
 
   const baseTickConfig = {
-    color: "#1976d2",
+    color: ACCENT_COLOR,
     textStrokeColor: "#ffffff",
     textStrokeWidth: 3,
     z: 10, // ensure ticks are above data and grid lines
@@ -96,8 +99,8 @@ function renderChart(data, rangeKey) {
         {
           label: "Percent Full",
           data: data.map(mapRowToFullness),
-          borderColor: "#1976d2",
-          backgroundColor: "rgba(255, 255, 255, 0.5)",
+          borderColor: ACCENT_COLOR,
+          backgroundColor: PRIMARY_COLOR,
           fill: true,
           pointRadius: 0,
           borderWidth: 2,
@@ -165,7 +168,7 @@ function renderChart(data, rangeKey) {
           callbacks: {
             label: function (context) {
               const value = context.parsed.y.toFixed(2);
-              return `Percent full: ${value}%`;
+              return `${value}% full`;
             },
           },
         },
@@ -177,14 +180,14 @@ function renderChart(data, rangeKey) {
                     type: "line",
                     yMin: currentFullness,
                     yMax: currentFullness,
-                    borderColor: "#1976d2",
+                    borderColor: ACCENT_COLOR,
                     borderWidth: 1,
                     borderDash: [10, 10],
                     label: {
                       display: true,
                       content: `Current: ${currentFullness.toFixed(2)}%`,
                       position: "end",
-                      color: "#1976d2",
+                      color: ACCENT_COLOR,
                       backgroundColor: "rgba(255,255,255,0.75)",
                     },
                   },
@@ -211,9 +214,7 @@ function setActiveButton(rangeKey) {
 async function init() {
   const csvText = await fetchCSV(CSV_URL);
   rawData = parseCSV(csvText);
-  console.log("Raw data loaded:");
-  console.table(rawData.slice(-100)); // Log last 100 rows for debugging
-  let currentRange = "10y";
+  let currentRange = DEFAULT_RANGE;
   setActiveButton(currentRange);
   renderChart(filterDataByRange(rawData, currentRange), currentRange);
   answerQuestion(rawData);
