@@ -61,7 +61,7 @@ function answerQuestion(data) {
   const answerText = document.getElementById("answer-text");
   const answerDetails = document.getElementById("answer-details");
   if (percentFull >= 100) {
-    answerText.textContent = "Yep";
+    answerText.textContent = "Yep 🎉";
     answerDetails.textContent = "";
   } else {
     answerText.textContent = "Nope";
@@ -83,6 +83,10 @@ function renderChart(data, rangeKey) {
       weight: "bold",
     },
   };
+
+  // Get the current fullness value
+  const currentFullness =
+    data.length > 0 ? mapRowToFullness(data[data.length - 1]) : null;
 
   chart = new Chart(ctx, {
     type: "line",
@@ -165,6 +169,28 @@ function renderChart(data, rangeKey) {
             },
           },
         },
+        annotation: {
+          annotations:
+            currentFullness !== null
+              ? {
+                  fullnessLine: {
+                    type: "line",
+                    yMin: currentFullness,
+                    yMax: currentFullness,
+                    borderColor: "#1976d2",
+                    borderWidth: 1,
+                    borderDash: [10, 10],
+                    label: {
+                      display: true,
+                      content: `Current: ${currentFullness.toFixed(2)}%`,
+                      position: "end",
+                      color: "#1976d2",
+                      backgroundColor: "rgba(255,255,255,0.75)",
+                    },
+                  },
+                }
+              : {},
+        },
       },
       interaction: {
         mode: "nearest",
@@ -172,6 +198,7 @@ function renderChart(data, rangeKey) {
         intersect: false,
       },
     },
+    plugins: [window["ChartAnnotation"]].filter(Boolean),
   });
 }
 

@@ -91,9 +91,9 @@ body {
 
 footer {
     position: absolute;
-    right: 20px;
     bottom: 30px;
-    font-size: .75rem;
+    right: 10px;
+    font-size: 10px;
     color: #fff;
 }
 
