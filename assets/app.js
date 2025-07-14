@@ -68,7 +68,7 @@ function answerQuestion(data) {
     answerDetails.textContent = "";
   } else {
     answerText.textContent = "Nope";
-    answerDetails.textContent = `${100 - percentFull.toFixed(2)}% to go`;
+    answerDetails.textContent = `${(100 - percentFull).toFixed(2)}% to go`;
   }
 }
 
