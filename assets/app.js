@@ -84,11 +84,23 @@ function renderChart(data, rangeKey) {
         x: {
           type: "time",
           time: {
-            unit: rangeKey === "1m" ? "day" : "month",
             tooltipFormat: "yyyy-MM-dd",
           },
           title: {
             display: false,
+          },
+          grid: {
+            drawTicks: false,
+          },
+          ticks: {
+            color: "#1976d2",
+            autoSkip: true,
+            autoSkipPadding: 5,
+            maxRotation: 0,
+            maxTicksLimit: 12,
+            padding: -20, // move tick labels into chart area
+            z: 10, // ensure ticks are above grid lines
+            align: "inner", // align ticks to the inner edge of the chart area
           },
         },
         y: {
@@ -96,6 +108,21 @@ function renderChart(data, rangeKey) {
           suggestedMax: 100, // prefer a max of 100%, but allow autoscaling
           title: {
             display: false,
+          },
+          grid: {
+            drawTicks: false,
+          },
+          ticks: {
+            color: "#1976d2",
+            mirror: true,
+            align: "center",
+            padding: 0,
+            callback: function (value, index, ticks) {
+              // Hide the first tick
+              if (index === 0) return null;
+              // Append % to y-axis labels
+              return value + "%";
+            },
           },
         },
       },
