@@ -46,9 +46,43 @@ function filterDataByRange(data, rangeKey) {
   return data.filter((row) => new Date(row.date) >= startDate);
 }
 
+function mapRowToFullness(row) {
+  const { reservoir_storage, conservation_capacity, dead_pool_capacity } = row;
+  const reservoir = Number(reservoir_storage);
+  const conservation = Number(conservation_capacity);
+  const deadPool = Number(dead_pool_capacity);
+  return ((reservoir - deadPool) / conservation) * 100;
+}
+
+function answerQuestion(data) {
+  const latestData = data[data.length - 1];
+  const percentFull = mapRowToFullness(latestData);
+
+  const answerText = document.getElementById("answer-text");
+  const answerDetails = document.getElementById("answer-details");
+  if (percentFull >= 100) {
+    answerText.textContent = "Yep";
+    answerDetails.textContent = "";
+  } else {
+    answerText.textContent = "Nope";
+    answerDetails.textContent = `${100 - percentFull.toFixed(2)}% to go`;
+  }
+}
+
 function renderChart(data, rangeKey) {
   const ctx = document.getElementById("lake-chart").getContext("2d");
   if (chart) chart.destroy();
+
+  const baseTickConfig = {
+    color: "#1976d2",
+    textStrokeColor: "#ffffff",
+    textStrokeWidth: 3,
+    z: 10, // ensure ticks are above data and grid lines
+    font: {
+      size: 14,
+      weight: "bold",
+    },
+  };
 
   chart = new Chart(ctx, {
     type: "line",
@@ -57,19 +91,9 @@ function renderChart(data, rangeKey) {
       datasets: [
         {
           label: "Percent Full",
-          data: data.map((row) => {
-            const {
-              reservoir_storage,
-              conservation_capacity,
-              dead_pool_capacity,
-            } = row;
-            const reservoir = Number(reservoir_storage);
-            const conservation = Number(conservation_capacity);
-            const deadPool = Number(dead_pool_capacity);
-            return ((reservoir - deadPool) / conservation) * 100;
-          }),
+          data: data.map(mapRowToFullness),
           borderColor: "#1976d2",
-          backgroundColor: "rgba(25, 118, 210, 0.1)",
+          backgroundColor: "rgba(255, 255, 255, 0.5)",
           fill: true,
           pointRadius: 0,
           borderWidth: 2,
@@ -80,6 +104,9 @@ function renderChart(data, rangeKey) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: { top: 0, right: 0, bottom: -50, left: -50 },
+      },
       scales: {
         x: {
           type: "time",
@@ -91,16 +118,14 @@ function renderChart(data, rangeKey) {
           },
           grid: {
             drawTicks: false,
+            display: false, // Hide x-axis grid lines
           },
           ticks: {
-            color: "#1976d2",
-            autoSkip: true,
-            autoSkipPadding: 5,
+            ...baseTickConfig,
             maxRotation: 0,
-            maxTicksLimit: 12,
-            padding: -20, // move tick labels into chart area
-            z: 10, // ensure ticks are above grid lines
-            align: "inner", // align ticks to the inner edge of the chart area
+            maxTicksLimit: rangeKey === "1y" ? 12 : 10,
+            padding: -20, // move tick labels into chart area,
+            align: "start", // align ticks to the inner edge of the chart area
           },
         },
         y: {
@@ -113,15 +138,15 @@ function renderChart(data, rangeKey) {
             drawTicks: false,
           },
           ticks: {
-            color: "#1976d2",
+            ...baseTickConfig,
             mirror: true,
-            align: "center",
             padding: 0,
+            align: "end",
             callback: function (value, index, ticks) {
-              // Hide the first tick
-              if (index === 0) return null;
+              // Hide the first and last tick
+              if (index === 0 || index === ticks.length - 1) return null;
               // Append % to y-axis labels
-              return value + "%";
+              return " " + value + "%";
             },
           },
         },
@@ -141,6 +166,11 @@ function renderChart(data, rangeKey) {
           },
         },
       },
+      interaction: {
+        mode: "nearest",
+        axis: "x",
+        intersect: false,
+      },
     },
   });
 }
@@ -159,11 +189,13 @@ async function init() {
   let currentRange = "10y";
   setActiveButton(currentRange);
   renderChart(filterDataByRange(rawData, currentRange), currentRange);
+  answerQuestion(rawData);
   document.querySelectorAll(".controls button").forEach((btn) => {
     btn.addEventListener("click", () => {
       currentRange = btn.dataset.range;
       setActiveButton(currentRange);
       renderChart(filterDataByRange(rawData, currentRange), currentRange);
+      answerQuestion(rawData);
     });
   });
 }
