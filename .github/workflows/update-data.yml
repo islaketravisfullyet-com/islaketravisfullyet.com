@@ -1,5 +1,8 @@
 name: Update data
 
+permissions:
+  contents: write
+
 on:
   schedule:
     # Run every 4 hours at 30 minutes past the hour (UTC)
