@@ -90,11 +90,13 @@ footer {
     font-size: .625rem;
     color: #fff;
     text-align: right;
+    max-width: calc(50vw - 225px);
 }
 
 @media (max-width: 600px) {
     footer {
-        max-width: 3rem;
+        max-width: calc(50vw - 160px);
+        min-width: 3rem;
     }
 }
 
