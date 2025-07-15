@@ -25,20 +25,22 @@
     <link rel="manifest" href="assets/favicons/site.webmanifest" />
   </head>
   <body>
-    <nav class="controls">
-      <button data-range="1m">1 Month</button>
-      <button data-range="1y">1 Year</button>
-      <button data-range="5y">5 Years</button>
-      <button data-range="10y" class="active">10 Years</button>
-      <button data-range="all">All</button>
-    </nav>
     <main>
       <div id="chart-container">
         <canvas id="lake-chart"></canvas>
       </div>
-      <div id="answer">
-        <h2 id="answer-text"></h2>
-        <p id="answer-details"></p>
+      <div id="bottom-bound">
+        <div id="answer">
+          <h2 id="answer-text"></h2>
+          <p id="answer-details"></p>
+        </div>
+        <nav id="controls">
+          <button data-range="1m">1 Month</button>
+          <button data-range="1y">1 Year</button>
+          <button data-range="5y">5 Years</button>
+          <button data-range="10y" class="active">10 Years</button>
+          <button data-range="all">All</button>
+        </nav>
       </div>
     </main>
     <footer>

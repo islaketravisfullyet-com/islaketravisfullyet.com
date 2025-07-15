@@ -206,7 +206,7 @@ function renderChart(data, rangeKey) {
 }
 
 function setActiveButton(rangeKey) {
-  document.querySelectorAll(".controls button").forEach((btn) => {
+  document.querySelectorAll("#controls button").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.range === rangeKey);
   });
 }
@@ -218,7 +218,7 @@ async function init() {
   setActiveButton(currentRange);
   renderChart(filterDataByRange(rawData, currentRange), currentRange);
   answerQuestion(rawData);
-  document.querySelectorAll(".controls button").forEach((btn) => {
+  document.querySelectorAll("#controls button").forEach((btn) => {
     btn.addEventListener("click", () => {
       currentRange = btn.dataset.range;
       setActiveButton(currentRange);
