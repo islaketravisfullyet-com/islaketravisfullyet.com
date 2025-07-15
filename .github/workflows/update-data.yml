@@ -1,0 +1,46 @@
+name: Update data
+
+on:
+  schedule:
+    # Run every 4 hours at 30 minutes past the hour (UTC)
+    - cron: "30 0,4,8,12,16,20 * * *"
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  fetch-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Remove stale data
+        run: rm assets/data/travis.csv
+
+      - name: Fetch latest data
+        run: |
+          curl -o assets/data/travis.csv https://waterdatafortexas.org/reservoirs/individual/travis.csv
+
+      - name: Verify file was downloaded
+        run: |
+          if [ -f assets/data/travis.csv ]; then
+            echo "File downloaded successfully"
+            echo "File size: $(wc -c < assets/data/travis.csv) bytes"
+            echo "First few lines:"
+            head -5 assets/data/travis.csv
+          else
+            echo "Error: File was not downloaded"
+            exit 1
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add assets/data/travis.csv
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update Lake Travis water level data - $(date)"
+            git push
+          fi

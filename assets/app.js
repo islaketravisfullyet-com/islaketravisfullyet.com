@@ -1,4 +1,4 @@
-const CSV_URL = "./assets/data.csv";
+const CSV_URL = "./assets/data/travis.csv";
 const PRIMARY_COLOR = "#239bcf";
 const ACCENT_COLOR = "#0791cc";
 const DEFAULT_RANGE = "10y"; // Default range to show on initial load
