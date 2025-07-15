@@ -1,4 +1,4 @@
-html {
+:root {
     --primaryColor: #239bcf;
     --accentColor: #0791cc;
     /* Font size used for rem calculations */
@@ -7,7 +7,7 @@ html {
 
 /* In mobile breakpoints, we use a smaller font size */
 @media (max-width: 425px) {
-    html {
+    :root {
         font-size: 10px;
     }
 }
