@@ -33,7 +33,7 @@ function parseCSV(text) {
     if (cols.length !== columnHeaders.length) continue; // Skip malformed rows
     const row = {};
     for (let j = 0; j < columnHeaders.length; j++) {
-      row[columnHeaders[j]] = cols[j] ? cols[j].trim() : null;
+      row[columnHeaders[j].trim()] = cols[j] ? cols[j].trim() : null;
     }
     data.push(row);
   }
