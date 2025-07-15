@@ -6,7 +6,7 @@
 }
 
 /* In mobile breakpoints, we use a smaller font size */
-@media (max-width: 425px) {
+@media (max-width: 600px) {
     :root {
         font-size: 10px;
     }
@@ -33,7 +33,7 @@ body {
     margin-bottom: 1.25rem;
     text-align: center;
     color: #fff;
-    text-shadow: rgba(0, 0, 0, .25) 0 0 4px;
+    text-shadow: rgba(0, 0, 0, .25) 0 0 10px;
 }
 
 #answer #answer-text {
@@ -89,6 +89,13 @@ footer {
     right: 10px;
     font-size: .625rem;
     color: #fff;
+    text-align: right;
+}
+
+@media (max-width: 600px) {
+    footer {
+        max-width: 3rem;
+    }
 }
 
 footer p {
