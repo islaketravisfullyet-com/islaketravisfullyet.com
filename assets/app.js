@@ -90,6 +90,10 @@ function renderChart(data, rangeKey) {
   // Get the current fullness value
   const currentFullness =
     data.length > 0 ? mapRowToFullness(data[data.length - 1]) : null;
+  const currentWaterLevel =
+    data.length > 0 && data[data.length - 1].water_level
+      ? data[data.length - 1].water_level
+      : null;
 
   chart = new Chart(ctx, {
     type: "line",
@@ -192,8 +196,12 @@ function renderChart(data, rangeKey) {
                     borderDash: [10, 10],
                     label: {
                       display: true,
-                      content: `Current: ${currentFullness.toFixed(2)}%`,
+                      content: [
+                        `Now: ${currentFullness.toFixed(2)}%`,
+                        currentWaterLevel ? `${currentWaterLevel} ft` : "",
+                      ].filter(Boolean),
                       position: "end",
+                      textAlign: "end",
                       color: ACCENT_COLOR,
                       backgroundColor: "rgba(255,255,255,0.75)",
                     },
