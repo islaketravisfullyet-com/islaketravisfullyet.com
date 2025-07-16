@@ -117,7 +117,7 @@ footer {
 }
 
 footer p {
-    margin: 0;
+    margin: .25rem 0 0;
 }
 
 footer p a {
