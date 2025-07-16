@@ -168,7 +168,14 @@ function renderChart(data, rangeKey) {
           callbacks: {
             label: function (context) {
               const value = context.parsed.y.toFixed(2);
-              return `${value}% full`;
+              // Find the original data row for this index
+              const dataIndex = context.dataIndex;
+              const row = data[dataIndex];
+              let lines = [`${value}% full`];
+              if (row && row.water_level) {
+                lines.push(`Water level: ${row.water_level} feet`);
+              }
+              return lines;
             },
           },
         },
