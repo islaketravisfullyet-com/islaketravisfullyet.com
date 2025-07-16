@@ -5,8 +5,8 @@ permissions:
 
 on:
   schedule:
-    # Run every 4 hours at 30 minutes past the hour (UTC)
-    - cron: "30 0,4,8,12,16,20 * * *"
+    # Run every hour at 30 minutes past the hour (UTC)
+    - cron: "30 * * * *"
   workflow_dispatch: # Allow manual triggering
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Remove stale data
-        run: rm assets/data/travis.csv
+        run: rm assets/data/travis.csv assets/data/travis-10year.csv
 
       - name: Fetch latest data
         run: |
@@ -36,11 +36,18 @@ jobs:
             exit 1
           fi
 
+      - name: Extract last 10 years of data (3650 lines)
+        run: |
+          # Extract the header (first non-comment line)
+          awk '!/^#/' assets/data/travis.csv | head -n 1 > assets/data/travis-10year.csv
+          # Append the last 3650 data lines
+          tail -n 3650 assets/data/travis.csv >> assets/data/travis-10year.csv
+
       - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add assets/data/travis.csv
+          git add assets/data/travis.csv assets/data/travis-10year.csv
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

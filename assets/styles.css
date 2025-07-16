@@ -71,6 +71,22 @@ body {
     font-weight: bold;
 }
 
+#controls button.loading {
+    cursor: progress;
+    animation: loading-pulse .5s infinite alternate;
+    opacity: 0.6;
+}
+
+@keyframes loading-pulse {
+    from {
+        opacity: 0.6;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
 #controls button:hover:not(.active) {
     background: color-mix(in srgb, var(--accentColor) 33%, transparent);
 }

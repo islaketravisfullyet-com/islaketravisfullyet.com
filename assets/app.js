@@ -1,4 +1,5 @@
-const CSV_URL = "./assets/data/travis.csv";
+const CSV_URL = "./assets/data/travis-10year.csv";
+const FULL_CSV_URL = "./assets/data/travis.csv";
 const PRIMARY_COLOR = "#239bcf";
 const ACCENT_COLOR = "#0791cc";
 const DEFAULT_RANGE = "1m"; // Default range to show on initial load
@@ -10,7 +11,6 @@ const chartRanges = {
   "10y": 365 * 10,
   all: Infinity,
 };
-let rawData = [];
 let chart;
 
 async function fetchCSV(url) {
@@ -211,16 +211,26 @@ function setActiveButton(rangeKey) {
   });
 }
 
+let isFullDataLoaded = false;
+
 async function init() {
-  const csvText = await fetchCSV(CSV_URL);
-  rawData = parseCSV(csvText);
+  let csvText = await fetchCSV(CSV_URL);
+  let rawData = parseCSV(csvText);
   let currentRange = DEFAULT_RANGE;
   setActiveButton(currentRange);
   renderChart(filterDataByRange(rawData, currentRange), currentRange);
   answerQuestion(rawData);
   document.querySelectorAll("#controls button").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       currentRange = btn.dataset.range;
+      if (currentRange === "all" && !isFullDataLoaded) {
+        // If "all" is selected, fetch the full dataset
+        btn.classList.add("loading");
+        csvText = await fetchCSV(FULL_CSV_URL);
+        rawData = parseCSV(csvText);
+        btn.classList.remove("loading");
+        isFullDataLoaded = true;
+      }
       setActiveButton(currentRange);
       renderChart(filterDataByRange(rawData, currentRange), currentRange);
       answerQuestion(rawData);
