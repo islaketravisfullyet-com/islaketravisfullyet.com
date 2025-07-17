@@ -134,7 +134,7 @@ function renderChart(data, rangeKey) {
           ticks: {
             ...baseTickConfig,
             maxRotation: 0,
-            maxTicksLimit: rangeKey === "1y" ? 12 : 10,
+            maxTicksLimit: rangeKey === "1y" ? 12 : 5,
             padding: -20, // move tick labels into chart area,
             align: "start", // align ticks to the inner edge of the chart area
           },

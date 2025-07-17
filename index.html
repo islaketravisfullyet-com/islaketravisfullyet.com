@@ -25,15 +25,15 @@
     <link rel="manifest" href="assets/favicons/site.webmanifest" />
   </head>
   <body>
-    <main>
-      <div id="chart-container">
-        <canvas id="lake-chart"></canvas>
+    <div id="chart-container">
+      <canvas id="lake-chart"></canvas>
+    </div>
+    <div id="bottom-bound">
+      <div id="answer">
+        <h2 id="answer-text"></h2>
+        <p id="answer-details"></p>
       </div>
-      <div id="bottom-bound">
-        <div id="answer">
-          <h2 id="answer-text"></h2>
-          <p id="answer-details"></p>
-        </div>
+      <div id="controls-and-credits">
         <nav id="controls">
           <button data-range="1m" class="active">1 month</button>
           <button data-range="1y">1 year</button>
@@ -41,22 +41,22 @@
           <button data-range="10y">10 years</button>
           <button data-range="all">All</button>
         </nav>
+        <footer>
+          <p>
+            <a
+              href="https://github.com/islaketravisfullyet-com/islaketravisfullyet.com"
+              >GitHub</a
+            >
+          </p>
+          <p>
+            Source:
+            <a href="https://waterdatafortexas.org/reservoirs/individual/travis"
+              >Water Data for Texas</a
+            >
+          </p>
+        </footer>
       </div>
-    </main>
-    <footer>
-      <p>
-        <a
-          href="https://github.com/islaketravisfullyet-com/islaketravisfullyet.com"
-          >GitHub</a
-        >
-      </p>
-      <p>
-        Source:
-        <a href="https://waterdatafortexas.org/reservoirs/individual/travis"
-          >Water Data for Texas</a
-        >
-      </p>
-    </footer>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
