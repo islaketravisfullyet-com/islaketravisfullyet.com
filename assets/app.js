@@ -169,6 +169,7 @@ function renderChart(data, rangeKey) {
         tooltip: {
           mode: "index",
           intersect: false,
+          displayColors: false,
           callbacks: {
             label: function (context) {
               const value = context.parsed.y.toFixed(2);
@@ -177,7 +178,7 @@ function renderChart(data, rangeKey) {
               const row = data[dataIndex];
               let lines = [`${value}% full`];
               if (row && row.water_level) {
-                lines.push(`Water level: ${row.water_level} feet`);
+                lines.push(`${row.water_level} feet`);
               }
               return lines;
             },
