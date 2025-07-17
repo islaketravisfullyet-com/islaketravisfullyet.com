@@ -101,7 +101,7 @@ function renderChart(data, rangeKey) {
       labels: data.map((row) => row.date),
       datasets: [
         {
-          label: "Percent Full",
+          label: "Percent full",
           data: data.map(mapRowToFullness),
           borderColor: ACCENT_COLOR,
           backgroundColor: PRIMARY_COLOR,
