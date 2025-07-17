@@ -204,7 +204,9 @@ function renderChart(data, rangeKey) {
                       position: "end",
                       textAlign: "end",
                       color: ACCENT_COLOR,
-                      backgroundColor: "rgba(255,255,255,0.75)",
+                      backgroundColor: "transparent",
+                      textStrokeColor: "#ffffff",
+                      textStrokeWidth: 3,
                     },
                   },
                 }
