@@ -33,13 +33,16 @@ body {
     position: fixed;
     bottom: 30px;
     width: 100%;
+    pointer-events: none;
 }
 
 #answer {
-    margin-bottom: 1rem;
+    width: fit-content;
+    margin: 0 auto 1rem;
     text-align: center;
     color: #fff;
     text-shadow: rgba(0, 0, 0, .25) 0 0 10px;
+    pointer-events: auto;
 }
 
 #answer #answer-text {
@@ -68,6 +71,7 @@ body {
     padding: .75rem;
     background: rgba(255, 255, 255, .75);
     border-radius: 8px;
+    pointer-events: auto;
 }
 
 #controls button {
@@ -115,6 +119,7 @@ footer {
     color: #fff;
     text-align: right;
     padding-right: .625rem;
+    pointer-events: auto;
 }
 
 footer p {
