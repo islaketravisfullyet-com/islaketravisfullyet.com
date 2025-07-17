@@ -115,9 +115,6 @@ function renderChart(data, rangeKey) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: { top: 0, right: 0, bottom: -50, left: -50 },
-      },
       scales: {
         x: {
           type: "time",
@@ -134,9 +131,12 @@ function renderChart(data, rangeKey) {
           ticks: {
             ...baseTickConfig,
             maxRotation: 0,
-            maxTicksLimit: rangeKey === "1y" ? 12 : 5,
-            padding: -20, // move tick labels into chart area,
-            align: "start", // align ticks to the inner edge of the chart area
+            maxTicksLimit: rangeKey === "1y" ? 12 : 10,
+            padding: -20, // move tick labels into chart area
+          },
+          afterUpdate: function (scale) {
+            // Fix for the first date tick adding padding to the left of the page
+            scale.paddingLeft = 0;
           },
         },
         y: {
@@ -152,13 +152,16 @@ function renderChart(data, rangeKey) {
             ...baseTickConfig,
             mirror: true,
             padding: 0,
-            align: "end",
             callback: function (value, index, ticks) {
-              // Hide the first and last tick
-              if (index === 0 || index === ticks.length - 1) return null;
+              // Hide the first tick
+              if (index === 0) return null;
               // Append % to y-axis labels
               return " " + value + "%";
             },
+          },
+          afterUpdate: function (scale) {
+            // Fix for the first fill percent tick adding padding to the bottom of the page
+            scale.paddingBottom = 0;
           },
         },
       },
