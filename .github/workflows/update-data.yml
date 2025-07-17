@@ -17,6 +17,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install DuckDB
+        run: curl https://install.duckdb.org | sh
+
       - name: Remove stale data
         run: rm assets/data/travis.csv assets/data/travis-10year.csv
 
@@ -35,6 +38,10 @@ jobs:
             echo "Error: File was not downloaded"
             exit 1
           fi
+
+      - name: Write full dataset to parquet
+        run: |
+         duckdb -c "COPY (SELECT * FROM 'assets/data/travis.csv') TO 'assets/data/travis.parquet' WITH (COMPRESSION ZSTD, COMPRESSION_LEVEL 20);"
 
       - name: Extract last 10 years of data (3650 lines)
         run: |

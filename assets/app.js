@@ -1,8 +1,61 @@
-const CSV_URL = "./assets/data/travis-10year.csv";
-const FULL_CSV_URL = "./assets/data/travis.csv";
+const CSV_URL = "assets/data/travis-10year.csv";
+const FULL_CSV_URL = "assets/data/travis.csv";
+const FULL_PARQUET_URL = "assets/data/travis.parquet";
 const PRIMARY_COLOR = "#239bcf";
 const ACCENT_COLOR = "#0791cc";
 const DEFAULT_RANGE = "1m"; // Default range to show on initial load
+const duckdbWorker = new Worker("assets/duckdb-worker.js", {type: "module"});
+let workerReady = false;
+let requestIdCounter = 0;
+const pendingRequests = new Map();
+
+duckdbWorker.onmessage = (event) => {
+  const { type, result, error, requestId } = event.data;
+  
+  if (type === 'init-done') {
+    workerReady = true;
+    return;
+  }
+  
+  const pendingRequest = pendingRequests.get(requestId);
+  if (pendingRequest) {
+    pendingRequests.delete(requestId);
+    if (type === 'query-result') {
+      pendingRequest.resolve(result);
+    } else if (type === 'error') {
+      pendingRequest.reject(new Error(error));
+    }
+  }
+};
+
+const initWorker = async () => {
+  if (workerReady) return;
+  
+  return new Promise((resolve, reject) => {
+    const requestId = ++requestIdCounter;
+    pendingRequests.set(requestId, { resolve, reject });
+    duckdbWorker.postMessage({ type: 'init', requestId });
+    
+    const originalResolve = pendingRequests.get(requestId).resolve;
+    pendingRequests.set(requestId, {
+      resolve: () => {
+        workerReady = true;
+        originalResolve();
+      },
+      reject
+    });
+  });
+};
+
+const queryDatabase = async (sql) => {
+  await initWorker();
+  
+  return new Promise((resolve, reject) => {
+    const requestId = ++requestIdCounter;
+    pendingRequests.set(requestId, { resolve, reject });
+    duckdbWorker.postMessage({ type: 'query', sql, requestId });
+  });
+};
 
 const chartRanges = {
   "1m": 30,
@@ -241,10 +294,19 @@ async function init() {
       currentRange = btn.dataset.range;
       if (currentRange === "all" && !isFullDataLoaded) {
         // If "all" is selected, fetch the full dataset
-        btn.classList.add("loading");
-        csvText = await fetchCSV(FULL_CSV_URL);
-        rawData = parseCSV(csvText);
-        btn.classList.remove("loading");
+        rawData = await queryDatabase(`
+          SELECT     
+            DATE_TRUNC('week', date) AS date,
+            ROUND(AVG(water_level),2) AS water_level,
+            ROUND(AVG(surface_area),2) AS surface_area,
+            ROUND(AVG(reservoir_storage),2) AS reservoir_storage,
+            ROUND(AVG(conservation_storage),2) AS conservation_storage,
+            ROUND(AVG(percent_full),2) AS percent_full,
+            ROUND(AVG(conservation_capacity),2) AS conservation_capacity,
+            ROUND(AVG(dead_pool_capacity),2) AS dead_pool_capacity
+          FROM '${window.location.href}${FULL_PARQUET_URL}'
+          GROUP BY DATE_TRUNC('week', date)
+          `);
         isFullDataLoaded = true;
       }
       setActiveButton(currentRange);
