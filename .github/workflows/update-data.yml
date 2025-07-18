@@ -17,6 +17,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install DuckDB
+        run: curl https://install.duckdb.org | sh
+
       - name: Remove stale data
         run: rm assets/data/travis.csv assets/data/travis-10year.csv
 
@@ -36,6 +39,10 @@ jobs:
             exit 1
           fi
 
+      - name: Write full dataset to parquet
+        run: |
+         duckdb -c "COPY (SELECT * FROM 'assets/data/travis.csv') TO 'assets/data/travis.parquet' WITH (COMPRESSION ZSTD, COMPRESSION_LEVEL 20);"
+
       - name: Extract last 10 years of data (3650 lines)
         run: |
           # Extract the header (first non-comment line)
@@ -47,7 +54,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add assets/data/travis.csv assets/data/travis-10year.csv
+          git add assets/data/travis.csv assets/data/travis-10year.csv assets/data/travis.parquet
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
