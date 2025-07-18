@@ -48,7 +48,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add assets/data/travis.csv assets/data/travis-10year.csv
-          if git diff --staged --quiet; then
+          if git diff -I'^#' --staged --quiet; then
             echo "No changes to commit"
           else
             git commit -m "Update Lake Travis water level data - $(date)"
