@@ -222,7 +222,31 @@ function renderChart(data, rangeKey) {
         intersect: false,
       },
     },
-    plugins: [window["ChartAnnotation"]].filter(Boolean),
+    plugins: [
+      window["ChartAnnotation"],
+      {
+        // Custom plugin to add DOM element above the fullnessLine
+        id: "fullnessWave",
+        afterLayout: function (chartInstance) {
+          console.log("Fullness wave plugin afterLayout called");
+          // Get chart canvas position
+          const canvas = chartInstance.canvas;
+          const rect = canvas.getBoundingClientRect();
+
+          let box = document.getElementById("fullness-wave");
+
+          if (currentFullness === null) return;
+
+          // Find the pixel y position of the fullnessLine
+          const yScale = chartInstance.scales.y;
+          if (!yScale) return;
+          const y = yScale.getPixelForValue(currentFullness);
+
+          // Position the bottom of the box at the annotation line
+          box.style.top = rect.top + window.scrollY + y + "px";
+        },
+      },
+    ].filter(Boolean),
   });
 }
 

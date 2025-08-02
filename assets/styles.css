@@ -29,6 +29,58 @@ body {
     height: 100%;
 }
 
+#fullness-wave {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    opacity: .2;
+    background-color: var(--accentColor);
+}
+
+#fullness-wave .wave {
+    width: 100%;
+    height: 24px;
+    transform: translateY(-24px);
+    background-color: var(--accentColor);
+    background-image: radial-gradient(#fff 35px, var(--accentColor) 37px);
+    background-size: 70px 48px;
+    background-position: 0 -26px;
+    background-repeat: repeat-x;
+    animation: waves 5s cubic-bezier(0.39, 0.27, 0.53, 0.65) infinite;
+    opacity: .5;
+}
+
+#fullness-wave .wave.wave-alternating {
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation-delay: -2.5s;
+    animation-duration: 2s;
+}
+
+@keyframes waves {
+    from {
+        background-size: 70px 48px;
+        background-position: 0 -26px;
+    }
+
+    50% {
+        background-size: 70px 36px;
+        background-position: 35px -22px;
+    }
+
+    to {
+        background-size: 70px 48px;
+        background-position: 70px -26px;
+    }
+}
+
+#lake-chart {
+    position: absolute;
+}
+
 #bottom-bound {
     position: fixed;
     bottom: 30px;
