@@ -3,13 +3,14 @@ const FULL_CSV_URL = "./assets/data/travis.csv";
 const PRIMARY_COLOR = "#239bcf";
 const ACCENT_COLOR = "#0791cc";
 const DEFAULT_RANGE = "1m"; // Default range to show on initial load
-
+const FULL_WATER_LEVEL = 681.0; // Full water level in feet
 const chartRanges = {
   "1m": 30,
   "1y": 365,
   "10y": 365 * 10,
   all: Infinity,
 };
+
 let chart;
 
 async function fetchCSV(url) {
@@ -56,9 +57,16 @@ function mapRowToFullness(row) {
   return ((reservoir - deadPool) / conservation) * 100;
 }
 
+function mapRowToFeetRemaining(row) {
+  const { water_level } = row;
+  const currentWaterLevel = Number(water_level);
+  return FULL_WATER_LEVEL - currentWaterLevel;
+}
+
 function answerQuestion(data) {
   const latestData = data[data.length - 1];
   const percentFull = mapRowToFullness(latestData);
+  const feetRemaining = mapRowToFeetRemaining(latestData);
 
   const answerText = document.getElementById("answer-text");
   const answerDetails = document.getElementById("answer-details");
@@ -67,7 +75,9 @@ function answerQuestion(data) {
     answerDetails.textContent = "";
   } else {
     answerText.textContent = "Nope";
-    answerDetails.textContent = `${(100 - percentFull).toFixed(2)}% to go`;
+    answerDetails.textContent = `${(100 - percentFull).toFixed(
+      2
+    )}% (${feetRemaining.toFixed(2)} ft) to go`;
   }
 }
 
