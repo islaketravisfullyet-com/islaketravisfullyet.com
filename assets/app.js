@@ -7,7 +7,6 @@ const DEFAULT_RANGE = "1m"; // Default range to show on initial load
 const chartRanges = {
   "1m": 30,
   "1y": 365,
-  "5y": 365 * 5,
   "10y": 365 * 10,
   all: Infinity,
 };
