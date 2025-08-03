@@ -241,7 +241,6 @@ function renderChart(data, rangeKey) {
         // Custom plugin to add DOM element above the fullnessLine
         id: "fullnessWave",
         afterLayout: function (chartInstance) {
-          console.log("Fullness wave plugin afterLayout called");
           // Get chart canvas position
           const canvas = chartInstance.canvas;
           const rect = canvas.getBoundingClientRect();
