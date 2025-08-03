@@ -224,6 +224,10 @@ function renderChart(data, rangeKey) {
                 }
               : {},
         },
+        decimation: {
+          enabled: true,
+          algorithm: "min-max",
+        },
       },
       interaction: {
         mode: "nearest",
