@@ -32,7 +32,7 @@ jobs:
             echo "File size: $(wc -c < assets/data/travis.csv) bytes"
             echo "First few lines:"
             head -5 assets/data/travis.csv
-            first_non_comment_line=$(grep -v '^[[:space:]]*$\|^[[:space:]]*#' assets/data/travis.csv | head -n 1 || true)
+            first_non_comment_line=$(grep -m 1 -v '^[[:space:]]*$\|^[[:space:]]*#' assets/data/travis.csv || true)
             if [ -z "$first_non_comment_line" ]; then
               echo "Error: Downloaded file is empty or contains only comments"
               exit 1
