@@ -22,7 +22,8 @@ jobs:
 
       - name: Fetch latest data
         run: |
-          curl -o assets/data/travis.csv https://waterdatafortexas.org/reservoirs/individual/travis.csv
+          set -euo pipefail
+          curl -L -fS -o assets/data/travis.csv https://waterdatafortexas.org/reservoirs/individual/travis.csv
 
       - name: Verify file was downloaded
         run: |
@@ -31,6 +32,15 @@ jobs:
             echo "File size: $(wc -c < assets/data/travis.csv) bytes"
             echo "First few lines:"
             head -5 assets/data/travis.csv
+            first_non_comment_line=$(grep -v '^[[:space:]]*$\|^[[:space:]]*#' assets/data/travis.csv | head -n 1 || true)
+            if [ -z "$first_non_comment_line" ]; then
+              echo "Error: Downloaded file is empty or contains only comments"
+              exit 1
+            fi
+            if printf '%s\n' "$first_non_comment_line" | grep -Eiq '^[[:space:]]*<'; then
+              echo "Error: Downloaded file appears to be HTML, not CSV"
+              exit 1
+            fi
           else
             echo "Error: File was not downloaded"
             exit 1
