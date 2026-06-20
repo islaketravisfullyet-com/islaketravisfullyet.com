@@ -20,7 +20,7 @@
 #     for more detailed explanations see http://waterdatafortexas.org/reservoirs/glossary
 # 
 # Estimated daily average data for Lake Travis
-#     generated: 2026-06-20T08:32:18.736527 UTC
+#     generated: 2026-06-20T11:29:50.707123 UTC
 #     url: http://waterdatafortexas.org/reservoirs/individual/travis.csv
 # 
 # Footnote:
@@ -30623,4 +30623,4 @@ date,water_level,surface_area,reservoir_storage,conservation_storage,percent_ful
 2026-06-17,671.76,16843.24,949081,932049,84.9,1098044,17032
 2026-06-18,671.85,16865.39,950598,933566,85.0,1098044,17032
 2026-06-19,671.93,16884.92,951948,934916,85.1,1098044,17032
-2026-06-20,671.89,16875.15,951272,934240,85.1,1098044,17032
+2026-06-20,671.93,16884.92,951948,934916,85.1,1098044,17032
