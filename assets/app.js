@@ -71,12 +71,12 @@ function answerQuestion(data) {
   const answerText = document.getElementById("answer-text");
   const answerDetails = document.getElementById("answer-details");
   if (percentFull >= 100) {
-    answerText.textContent = "Yep 🎉";
+    answerText.textContent = "Yup 🎉";
     answerDetails.textContent = "";
   } else {
     answerText.textContent = "Nope";
     answerDetails.textContent = `${(100 - percentFull).toFixed(
-      2
+      2,
     )}% (${feetRemaining.toFixed(2)} ft) to go`;
   }
 }
