@@ -1,5 +1,6 @@
 const CSV_URL = "./assets/data/travis-10year.csv";
 const FULL_CSV_URL = "./assets/data/travis.csv";
+const LIVE_JSON_URL = "./assets/data/travis-live.json";
 const PRIMARY_COLOR = "#239bcf";
 const ACCENT_COLOR = "#0791cc";
 const DEFAULT_RANGE = "1m"; // Default range to show on initial load
@@ -17,6 +18,17 @@ async function fetchCSV(url) {
   const res = await fetch(url);
   const text = await res.text();
   return text;
+}
+
+async function fetchJSON(url) {
+  const res = await fetch(url);
+  return res.json();
+}
+
+function parseDate(value) {
+  if (!value) return null;
+  const parsed = new Date(value.replace(" ", "T"));
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 // Parse CSV text into structured data
@@ -50,23 +62,38 @@ function filterDataByRange(data, rangeKey) {
 }
 
 function mapRowToFullness(row) {
-  const { reservoir_storage, conservation_capacity, dead_pool_capacity } = row;
-  const reservoir = Number(reservoir_storage);
-  const conservation = Number(conservation_capacity);
-  const deadPool = Number(dead_pool_capacity);
-  return ((reservoir - deadPool) / conservation) * 100;
+  const reservoirStorage = Number(row.reservoir_storage);
+  const conservationCapacity = Number(row.conservation_capacity);
+  const deadPoolCapacity = Number(row.dead_pool_capacity);
+  return ((reservoirStorage - deadPoolCapacity) / conservationCapacity) * 100;
 }
 
 function mapRowToFeetRemaining(row) {
-  const { water_level } = row;
-  const currentWaterLevel = Number(water_level);
+  const currentWaterLevel = Number(row.water_level);
   return FULL_WATER_LEVEL - currentWaterLevel;
 }
 
-function answerQuestion(data) {
-  const latestData = data[data.length - 1];
-  const percentFull = mapRowToFullness(latestData);
-  const feetRemaining = mapRowToFeetRemaining(latestData);
+// Only returns live data if it is more recent than the latest historical data point
+function getRecentLiveData(historicalData, liveData) {
+  if (!historicalData.length || !liveData) return null;
+
+  const latestHistoricalData = historicalData[historicalData.length - 1];
+  const latestHistoricalDate = parseDate(latestHistoricalData.date);
+  const liveReadDate = parseDate(liveData.readDate);
+
+  if (!latestHistoricalDate || !liveReadDate) return null;
+  if (liveReadDate < latestHistoricalDate) return null;
+
+  return liveData;
+}
+
+function answerQuestion(combinedData) {
+  const latestData = combinedData[combinedData.length - 1];
+  const percentFull = latestData.percentFull;
+  const feetRemaining =
+    latestData.waterLevel != null
+      ? FULL_WATER_LEVEL - latestData.waterLevel
+      : 0;
 
   const answerText = document.getElementById("answer-text");
   const answerDetails = document.getElementById("answer-details");
@@ -81,7 +108,7 @@ function answerQuestion(data) {
   }
 }
 
-function renderChart(data, rangeKey) {
+function renderChart(combinedData, rangeKey) {
   const ctx = document.getElementById("lake-chart").getContext("2d");
   if (chart) chart.destroy();
 
@@ -96,22 +123,21 @@ function renderChart(data, rangeKey) {
     },
   };
 
-  // Get the current fullness value
-  const currentFullness =
-    data.length > 0 ? mapRowToFullness(data[data.length - 1]) : null;
-  const currentWaterLevel =
-    data.length > 0 && data[data.length - 1].water_level
-      ? data[data.length - 1].water_level
-      : null;
+  const latestData = combinedData[combinedData.length - 1] ?? null;
+  const currentFullness = latestData?.percentFull ?? null;
+  const currentWaterLevel = latestData?.waterLevel ?? null;
+
+  const labels = combinedData.map((row) => row.date);
+  const values = combinedData.map((row) => row.percentFull);
 
   chart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: data.map((row) => row.date),
+      labels,
       datasets: [
         {
           label: "Percent full",
-          data: data.map(mapRowToFullness),
+          data: values,
           borderColor: ACCENT_COLOR,
           backgroundColor: PRIMARY_COLOR,
           fill: true,
@@ -185,13 +211,14 @@ function renderChart(data, rangeKey) {
           callbacks: {
             label: function (context) {
               const value = context.parsed.y.toFixed(2);
-              // Find the original data row for this index
               const dataIndex = context.dataIndex;
-              const row = data[dataIndex];
-              let lines = [`${value}% full`];
-              if (row && row.water_level) {
-                lines.push(`${row.water_level} feet`);
+              const row = combinedData[dataIndex];
+              const lines = [`${value}% full`];
+
+              if (row?.waterLevel != null) {
+                lines.push(`${row.waterLevel.toFixed(2)} feet`);
               }
+
               return lines;
             },
           },
@@ -268,29 +295,71 @@ function setActiveButton(rangeKey) {
   });
 }
 
+// Returns basic data for a combined data set, using historical data and including live data if available and recent
+function buildCombinedData(historicalData, recentLiveData) {
+  const combinedData = historicalData.map((row) => ({
+    date: row.date,
+    percentFull: mapRowToFullness(row),
+    waterLevel: row.water_level ? Number(row.water_level) : null,
+  }));
+
+  if (recentLiveData) {
+    const lastHistoricalDate = combinedData[combinedData.length - 1]?.date;
+    const liveDate = parseDate(recentLiveData.readDate)
+      ?.toISOString()
+      .slice(0, 10);
+
+    const liveDataEntry = {
+      date: liveDate,
+      percentFull: recentLiveData.percentFull,
+      waterLevel: recentLiveData.waterLevel,
+    };
+
+    if (lastHistoricalDate === liveDate) {
+      combinedData[combinedData.length - 1] = liveDataEntry;
+    } else {
+      combinedData.push(liveDataEntry);
+    }
+  }
+
+  return combinedData;
+}
+
 let isFullDataLoaded = false;
 
 async function init() {
-  let csvText = await fetchCSV(CSV_URL);
-  let rawData = parseCSV(csvText);
+  let [historicalCsvString, liveData] = await Promise.all([
+    fetchCSV(CSV_URL),
+    fetchJSON(LIVE_JSON_URL),
+  ]);
+
+  let historicalData = parseCSV(historicalCsvString);
   let currentRange = DEFAULT_RANGE;
+  let recentLiveData = getRecentLiveData(historicalData, liveData);
+  let combinedData = buildCombinedData(historicalData, recentLiveData);
+
   setActiveButton(currentRange);
-  renderChart(filterDataByRange(rawData, currentRange), currentRange);
-  answerQuestion(rawData);
+  renderChart(filterDataByRange(combinedData, currentRange), currentRange);
+  answerQuestion(combinedData);
+
   document.querySelectorAll("#controls button").forEach((btn) => {
     btn.addEventListener("click", async () => {
       currentRange = btn.dataset.range;
+
+      // If "all" is selected, fetch the full dataset
       if (currentRange === "all" && !isFullDataLoaded) {
-        // If "all" is selected, fetch the full dataset
         btn.classList.add("loading");
-        csvText = await fetchCSV(FULL_CSV_URL);
-        rawData = parseCSV(csvText);
+        historicalCsvString = await fetchCSV(FULL_CSV_URL);
+        historicalData = parseCSV(historicalCsvString);
         btn.classList.remove("loading");
         isFullDataLoaded = true;
       }
+
       setActiveButton(currentRange);
-      renderChart(filterDataByRange(rawData, currentRange), currentRange);
-      answerQuestion(rawData);
+      recentLiveData = getRecentLiveData(historicalData, liveData);
+      combinedData = buildCombinedData(historicalData, recentLiveData);
+      renderChart(filterDataByRange(combinedData, currentRange), currentRange);
+      answerQuestion(combinedData);
     });
   });
 }
