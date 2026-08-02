@@ -1,15 +1,9 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
-
-const REPO_ROOT = path.resolve(__dirname, "..", "..");
-const LAKE_LEVEL_PATH = path.join(REPO_ROOT, "assets", "data", "LakeLevel.csv");
-const OUTPUT_PATH = path.join(REPO_ROOT, "assets", "data", "travis-live.json");
-
 const DEAD_POOL_CAPACITY = 17032;
 const CONSERVATION_CAPACITY = 1098044;
 const LAKE_NAME = "Travis";
+const LAKE_LEVEL_URL = "https://hydromet.lcra.org/media/LakeLevel.csv";
 
 function parseLakeLevelCsv(text) {
   const lines = text
@@ -55,7 +49,19 @@ function calculateFullnessFromStorage(storage) {
   return Math.max(0, Math.min(100, percent));
 }
 
-function writeSnapshot({ currentLevel, fullnessPercent, readDate }) {
+async function fetchLakeLevelCsv() {
+  const response = await fetch(LAKE_LEVEL_URL);
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch LakeLevel.csv: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  return response.text();
+}
+
+function printSnapshot({ currentLevel, fullnessPercent, readDate }) {
   const outputText = [
     "{",
     `  "lakeLevel": ${currentLevel.toFixed(2)},`,
@@ -65,13 +71,11 @@ function writeSnapshot({ currentLevel, fullnessPercent, readDate }) {
     "",
   ].join("\n");
 
-  fs.writeFileSync(OUTPUT_PATH, outputText);
-  console.log(`Wrote ${OUTPUT_PATH}`);
   console.log(outputText.trim());
 }
 
-function main() {
-  const lakeLevelText = fs.readFileSync(LAKE_LEVEL_PATH, "utf8");
+async function main() {
+  const lakeLevelText = await fetchLakeLevelCsv();
 
   const { currentLevel, currentStorage, readDate } =
     parseLakeLevelCsv(lakeLevelText);
@@ -84,7 +88,7 @@ function main() {
 
   const fullnessPercent = calculateFullnessFromStorage(currentStorage);
 
-  writeSnapshot({
+  printSnapshot({
     currentLevel,
     fullnessPercent,
     readDate,
@@ -92,5 +96,8 @@ function main() {
 }
 
 if (require.main === module) {
-  main();
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
 }
