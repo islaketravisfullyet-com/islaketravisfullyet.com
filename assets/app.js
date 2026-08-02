@@ -169,11 +169,12 @@ function renderChart(combinedData, rangeKey) {
             ...baseTickConfig,
             maxRotation: 0,
             maxTicksLimit: rangeKey === "1y" ? 12 : 10,
-            padding: -20, // move tick labels into chart area
+            padding: -26, // move tick labels into chart area, font is 14px
           },
           afterUpdate: function (scale) {
             // Fix for the first date tick adding padding to the left of the page
             scale.paddingLeft = 0;
+            scale.ticks[0].label = ""; // Hide the first tick label;
           },
         },
         y: {
@@ -192,8 +193,10 @@ function renderChart(combinedData, rangeKey) {
             callback: function (value, index, ticks) {
               // Hide the first tick
               if (index === 0) return null;
-              // Append % to y-axis labels
-              return " " + value + "%";
+              // Prepend space-based padding due to this bug:
+              // https://github.com/chartjs/Chart.js/issues/11739
+              // Also, append % to y-axis labels
+              return "   " + value + "%";
             },
           },
           afterUpdate: function (scale) {

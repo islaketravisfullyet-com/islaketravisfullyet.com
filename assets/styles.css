@@ -83,7 +83,8 @@ body {
 
 #bottom-bound {
     position: fixed;
-    bottom: 30px;
+    /* label height is 26px */
+    bottom: 38px;
     width: 100%;
     pointer-events: none;
 }
