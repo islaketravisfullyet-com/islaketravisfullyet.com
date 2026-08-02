@@ -99,7 +99,7 @@ function answerQuestion(combinedData) {
   const answerText = document.getElementById("answer-text");
   const answerDetails = document.getElementById("answer-details");
   if (percentFull >= 100) {
-    answerText.textContent = "Yup 🎉";
+    answerText.textContent = "Yup 💦";
     answerDetails.textContent = "";
   } else {
     answerText.textContent = "Nope";
