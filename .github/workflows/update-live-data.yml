@@ -20,7 +20,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Refresh LakeLevel.csv from LCRA
+      - name: Fetch LakeLevel.csv from LCRA
         run: |
           set -o pipefail
           curl -L -fS -o assets/data/LakeLevel.csv https://hydromet.lcra.org/media/LakeLevel.csv
@@ -29,11 +29,14 @@ jobs:
         run: |
           node .github/workflows/compute-live-fullness.js
 
+      - name: Remove temporary LakeLevel.csv file
+        run: rm assets/data/LakeLevel.csv
+
       - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add assets/data/LakeLevel.csv assets/data/travis-live.json
+          git add assets/data/travis-live.json
           if git diff -I'^#' --staged --quiet; then
             echo "No changes to commit"
           else
