@@ -114,9 +114,9 @@ function renderChart(combinedData, rangeKey) {
   if (chart) chart.destroy();
 
   const baseTickConfig = {
-    color: ACCENT_COLOR,
-    textStrokeColor: WHITE_COLOR,
-    textStrokeWidth: 3,
+    color: WHITE_COLOR,
+    textStrokeColor: PRIMARY_COLOR,
+    textStrokeWidth: 4,
     z: 10, // ensure ticks are above data and grid lines
     font: {
       size: 14,
