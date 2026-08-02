@@ -3,6 +3,7 @@ const FULL_CSV_URL = "./assets/data/travis.csv";
 const LIVE_JSON_URL = "./assets/data/travis-live.json";
 const PRIMARY_COLOR = "#239bcf";
 const ACCENT_COLOR = "#0791cc";
+const WHITE_COLOR = "#ffffff";
 const DEFAULT_RANGE = "1m"; // Default range to show on initial load
 const FULL_WATER_LEVEL = 681.0; // Full water level in feet
 const chartRanges = {
@@ -114,7 +115,7 @@ function renderChart(combinedData, rangeKey) {
 
   const baseTickConfig = {
     color: ACCENT_COLOR,
-    textStrokeColor: "#ffffff",
+    textStrokeColor: WHITE_COLOR,
     textStrokeWidth: 3,
     z: 10, // ensure ticks are above data and grid lines
     font: {
@@ -141,7 +142,8 @@ function renderChart(combinedData, rangeKey) {
           borderColor: ACCENT_COLOR,
           backgroundColor: PRIMARY_COLOR,
           fill: true,
-          pointRadius: 0,
+          pointBackgroundColor: ACCENT_COLOR,
+          pointBorderWidth: 0,
           borderWidth: 2,
           tension: 0.1,
         },
@@ -200,6 +202,12 @@ function renderChart(combinedData, rangeKey) {
           },
         },
       },
+      elements: {
+        point: {
+          radius: 0,
+          hoverRadius: 10,
+        },
+      },
       plugins: {
         legend: {
           display: false,
@@ -222,6 +230,12 @@ function renderChart(combinedData, rangeKey) {
               return lines;
             },
           },
+          titleFont: {
+            size: 16,
+          },
+          bodyFont: {
+            size: 16,
+          },
         },
         annotation: {
           annotations:
@@ -237,15 +251,19 @@ function renderChart(combinedData, rangeKey) {
                     label: {
                       display: true,
                       content: [
-                        `Now: ${currentFullness.toFixed(2)}%`,
-                        currentWaterLevel ? `${currentWaterLevel} ft` : "",
+                        `${currentFullness.toFixed(2)}% full`,
+                        currentWaterLevel ? `${currentWaterLevel} feet` : "",
                       ].filter(Boolean),
                       position: "end",
+                      yAdjust: 30,
                       textAlign: "end",
-                      color: ACCENT_COLOR,
+                      font: {
+                        size: 20,
+                      },
+                      color: WHITE_COLOR,
                       backgroundColor: "transparent",
-                      textStrokeColor: "#ffffff",
-                      textStrokeWidth: 3,
+                      textStrokeColor: PRIMARY_COLOR,
+                      textStrokeWidth: 6,
                     },
                   },
                 }
