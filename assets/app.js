@@ -169,6 +169,7 @@ function renderChart(combinedData, rangeKey) {
             ...baseTickConfig,
             maxRotation: 0,
             maxTicksLimit: rangeKey === "1y" ? 12 : 10,
+            autoSkipPadding: 30,
             padding: -26, // move tick labels into chart area, font is 14px
           },
           afterUpdate: function (scale) {
