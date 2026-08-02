@@ -252,7 +252,9 @@ function renderChart(combinedData, rangeKey) {
                       display: true,
                       content: [
                         `${currentFullness.toFixed(2)}% full`,
-                        currentWaterLevel ? `${currentWaterLevel} feet` : "",
+                        currentWaterLevel
+                          ? `${currentWaterLevel.toFixed(2)} feet`
+                          : "",
                       ].filter(Boolean),
                       position: "end",
                       yAdjust: 30,
