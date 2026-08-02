@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Remove stale data
         run: rm assets/data/travis.csv assets/data/travis-10year.csv
