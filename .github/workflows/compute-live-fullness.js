@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 
+const fs = require("fs");
+const path = require("path");
+
 const DEAD_POOL_CAPACITY = 17032;
 const CONSERVATION_CAPACITY = 1098044;
 const LAKE_NAME = "Travis";
 const LAKE_LEVEL_URL = "https://hydromet.lcra.org/media/LakeLevel.csv";
+const REPO_ROOT = path.resolve(__dirname, "..", "..");
+const OUTPUT_PATH = path.join(REPO_ROOT, "assets", "data", "travis-live.json");
 
 function parseLakeLevelCsv(text) {
   const lines = text
@@ -46,7 +51,7 @@ function calculateFullnessFromStorage(storage) {
   const percent =
     ((storage - DEAD_POOL_CAPACITY) / CONSERVATION_CAPACITY) * 100;
 
-  return Math.max(0, Math.min(100, percent));
+  return Math.max(0, percent);
 }
 
 async function fetchLakeLevelCsv() {
@@ -61,16 +66,22 @@ async function fetchLakeLevelCsv() {
   return response.text();
 }
 
-function printSnapshot({ currentLevel, fullnessPercent, readDate }) {
-  const outputText = [
-    "{",
-    `  "lakeLevel": ${currentLevel.toFixed(2)},`,
-    `  "fullnessPercent": ${fullnessPercent.toFixed(2)},`,
-    `  "readDate": "${readDate}"`,
-    "}",
-    "",
-  ].join("\n");
+function writeSnapshot({
+  currentLevel,
+  currentStorage,
+  percentFull,
+  readDate,
+}) {
+  const output = {
+    waterLevel: currentLevel,
+    currentStorage: currentStorage,
+    percentFull: percentFull,
+    readDate: readDate,
+  };
+  const outputText = JSON.stringify(output, null, 2);
 
+  fs.writeFileSync(OUTPUT_PATH, outputText);
+  console.log(`Wrote ${OUTPUT_PATH}`);
   console.log(outputText.trim());
 }
 
@@ -86,11 +97,12 @@ async function main() {
     );
   }
 
-  const fullnessPercent = calculateFullnessFromStorage(currentStorage);
+  const percentFull = calculateFullnessFromStorage(currentStorage);
 
-  printSnapshot({
+  writeSnapshot({
     currentLevel,
-    fullnessPercent,
+    currentStorage,
+    percentFull,
     readDate,
   });
 }
