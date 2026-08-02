@@ -23,3 +23,15 @@ jobs:
       - name: Generate live fullness snapshot
         run: |
           node .github/workflows/compute-live-fullness.js
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add assets/data/travis-live.json
+          if git diff -I'^#' --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update Lake Travis live data - $(date)"
+            git push
+          fi
