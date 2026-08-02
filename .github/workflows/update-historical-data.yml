@@ -1,19 +1,16 @@
-name: Update data
+name: Update historical data
 
 permissions:
   contents: write
 
 on:
   schedule:
-    # Run every hour at 2 minutes past the hour (UTC)
-    # According to the LCRA (https://hydromet.lcra.org/media),
-    # the water data is gathered every 15 minutes and then it takes
-    # about 2 minutes to generate new reports.
-    - cron: "2 * * * *"
+    # Run hourly on the hour (UTC)
+    - cron: "0 * * * *"
   workflow_dispatch: # Allow manual triggering
 
 jobs:
-  fetch-data:
+  fetch-historical-data:
     runs-on: ubuntu-latest
 
     steps:
@@ -49,12 +46,6 @@ jobs:
             exit 1
           fi
 
-      - name: Refresh LakeLevel.csv from LCRA
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          curl -L -fS -o assets/data/LakeLevel.csv https://hydromet.lcra.org/media/LakeLevel.csv
-
       - name: Extract last 10 years of data (3650 lines)
         run: |
           # Extract the header (first non-comment line)
@@ -62,19 +53,14 @@ jobs:
           # Append the last 3650 data lines
           tail -n 3650 assets/data/travis.csv >> assets/data/travis-10year.csv
 
-      - name: Generate live fullness snapshot
-        continue-on-error: true
-        run: |
-          node .github/workflows/compute-live-fullness.js
-
       - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add assets/data/travis.csv assets/data/travis-10year.csv assets/data/travis-live.json
+          git add assets/data/travis.csv assets/data/travis-10year.csv
           if git diff -I'^#' --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Update Lake Travis water level data - $(date)"
+            git commit -m "Update Lake Travis historical data - $(date)"
             git push
           fi
