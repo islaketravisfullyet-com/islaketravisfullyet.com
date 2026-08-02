@@ -63,7 +63,12 @@ async function fetchLakeLevelCsv() {
     );
   }
 
-  return response.text();
+  const responseText = await response.text();
+
+  console.log(`Fetched LakeLevel.csv from ${LAKE_LEVEL_URL}:`);
+  console.log(responseText);
+
+  return responseText;
 }
 
 function writeSnapshot({
@@ -81,7 +86,7 @@ function writeSnapshot({
   const outputText = JSON.stringify(output, null, 2);
 
   fs.writeFileSync(OUTPUT_PATH, outputText);
-  console.log(`Wrote ${OUTPUT_PATH}`);
+  console.log(`Wrote ${OUTPUT_PATH}:`);
   console.log(outputText.trim());
 }
 
