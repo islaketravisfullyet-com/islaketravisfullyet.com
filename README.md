@@ -4,7 +4,7 @@ This is a [single-serving site](https://en.wikipedia.org/wiki/Single-serving_sit
 
 It's hosted at: [islaketravisfullyet.com](https://islaketravisfullyet.com/)
 
-It's intended to improve on a related project, [isthelakefullyet.com](https://isthelakefullyet.com/), which [was open-source](https://github.com/sophshep/isthelakefullyet) but has since been forked and gone private. This site adds historical data and uses data directly from [Water Data For Texas](https://waterdatafortexas.org/reservoirs), a product of the [Texas Water Development Board](http://www.twdb.texas.gov/).
+It's intended to improve on a related project, [isthelakefullyet.com](https://isthelakefullyet.com/), which [was a public repo](https://github.com/sophshep/isthelakefullyet) but has since been forked and gone private. This site adds historical data to the most recent water level reading using data from [Water Data For Texas](https://waterdatafortexas.org/reservoirs), a product of the [Texas Water Development Board](http://www.twdb.texas.gov/), and [the LCRA](https://hydromet.lcra.org/Reports/HighlandLakesSummary).
 
 Contributions are welcome. Just open a pull request.
 
