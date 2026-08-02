@@ -120,7 +120,7 @@ body {
     grid-column: 2;
     display: flex;
     gap: .625rem;
-    padding: .75rem;
+    padding: .625rem;
     background: rgba(255, 255, 255, .75);
     border-radius: 8px;
     pointer-events: auto;
