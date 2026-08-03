@@ -329,20 +329,18 @@ function buildCombinedData(historicalData, recentLiveData) {
 
   if (recentLiveData) {
     const lastHistoricalDate = combinedData[combinedData.length - 1]?.date;
-    const liveDate = parseDate(recentLiveData.readDate)
-      ?.toISOString()
-      .slice(0, 10);
+    const recentLiveDate = recentLiveData.readDate?.slice(0, 10);
 
-    const liveDataEntry = {
-      date: liveDate,
+    const recentLiveDataEntry = {
+      date: recentLiveDate,
       percentFull: recentLiveData.percentFull,
       waterLevel: recentLiveData.waterLevel,
     };
 
-    if (lastHistoricalDate === liveDate) {
-      combinedData[combinedData.length - 1] = liveDataEntry;
+    if (lastHistoricalDate === recentLiveDate) {
+      combinedData[combinedData.length - 1] = recentLiveDataEntry;
     } else {
-      combinedData.push(liveDataEntry);
+      combinedData.push(recentLiveDataEntry);
     }
   }
 
