@@ -5,8 +5,9 @@ permissions:
 
 on:
   schedule:
-    # Run hourly on the hour (UTC)
-    - cron: "0 * * * *"
+    # Run at 12:10 AM and PM Central Time every day
+    - cron: "10 0,12 * * *"
+      timezone: "America/Central"
   workflow_dispatch: # Allow manual triggering
 
 jobs:
