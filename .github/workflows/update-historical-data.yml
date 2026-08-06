@@ -7,7 +7,7 @@ on:
   schedule:
     # Run at 12:10 AM and PM Central Time every day
     - cron: "10 0,12 * * *"
-      timezone: "America/Central"
+      timezone: "America/Chicago"
   workflow_dispatch: # Allow manual triggering
 
 jobs:
