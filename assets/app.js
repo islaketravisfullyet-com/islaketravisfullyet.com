@@ -4,7 +4,7 @@ const LIVE_JSON_URL = "./assets/data/travis-live.json";
 const PRIMARY_COLOR = "#239bcf";
 const ACCENT_COLOR = "#0791cc";
 const WHITE_COLOR = "#ffffff";
-const DEFAULT_RANGE = "1m"; // Default range to show on initial load
+const DEFAULT_RANGE = "1y"; // Default range to show on initial load
 const FULL_WATER_LEVEL = 681.0; // Full water level in feet
 const chartRanges = {
   "1m": 30,

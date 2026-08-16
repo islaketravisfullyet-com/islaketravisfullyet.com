@@ -4,7 +4,7 @@ This is a static website hosted on GitHub Pages. We fetch data about current wat
 
 This page has an interactive line chart taking up the full width and height of the page. Chart.js is used to render the chart. The chart displays how full Lake Travis is over time, with the x-axis showing dates and the y-axis showing the percent full. The chart should be responsive and adapt to different screen sizes.
 
-Users are able to customize the amount of time displayed in the chart with options for 1 month, 1 year, 10 years, and all. The default is 1 month. The selected time range should stand out.
+Users are able to customize the amount of time displayed in the chart with options for 1 month, 1 year, 10 years, and all. The default is 1 year. The selected time range should stand out.
 
 The historical chart data is sourced from Water Data For Texas: https://waterdatafortexas.org/reservoirs/individual/travis. We use the period of record data download CSV located here: https://waterdatafortexas.org/reservoirs/individual/travis.csv. Ignore the comments at the top (lines preceded with a #).
 
