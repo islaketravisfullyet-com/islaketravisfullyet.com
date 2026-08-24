@@ -9,7 +9,7 @@ on:
     # According to the LCRA (https://hydromet.lcra.org/media),
     # the water data is gathered every 15 minutes and then it takes
     # about 2 minutes to generate new reports.
-    - cron: "2 * * * *"
+    - cron: "2 1-23 * * *"
   workflow_dispatch: # Allow manual triggering
 
 jobs:
