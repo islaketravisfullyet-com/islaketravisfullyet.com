@@ -22,7 +22,18 @@ jobs:
 
       - name: Generate live fullness snapshot
         run: |
-          node .github/workflows/compute-live-fullness.js
+          set -o pipefail
+          if node .github/workflows/compute-live-fullness.js 2>&1 | tee /tmp/live-fullness.log; then
+            exit 0
+          fi
+          # LCRA sometimes serves an empty LakeLevel.csv around midnight.
+          if grep -q "LakeLevel.csv does not contain enough content to parse" /tmp/live-fullness.log; then
+            echo "Upstream LakeLevel.csv was incomplete; waiting 1 minute and retrying..."
+            sleep 60
+            node .github/workflows/compute-live-fullness.js
+          else
+            exit 1
+          fi
 
       - name: Commit and push changes
         run: |
