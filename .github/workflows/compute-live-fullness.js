@@ -7,60 +7,19 @@ const DEAD_POOL_CAPACITY = 17032;
 const CONSERVATION_CAPACITY = 1098044;
 const LAKE_NAME = "Travis";
 const LAKE_LEVEL_URL = "https://hydromet.lcra.org/media/LakeLevel.csv";
-const CENTRAL_TIME_ZONE = "America/Chicago";
-const MAX_DATA_AGE_MS = 24 * 60 * 60 * 1000;
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
 const OUTPUT_PATH = path.join(REPO_ROOT, "assets", "data", "travis-live.json");
 
-function parseCentralDateTimeToUtcMs(dateTime) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/.exec(
-    dateTime,
-  );
-
-  if (!match) {
-    throw new Error(
-      `Lake Travis read date could not be parsed as Central Time: ${dateTime}`,
-    );
+function readSavedSnapshot() {
+  if (!fs.existsSync(OUTPUT_PATH)) {
+    return null;
   }
 
-  const [, year, month, day, hour, minute, second = "0"] = match;
-  const utcGuess = Date.UTC(
-    Number(year),
-    Number(month) - 1,
-    Number(day),
-    Number(hour),
-    Number(minute),
-    Number(second),
-  );
-
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: CENTRAL_TIME_ZONE,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hourCycle: "h23",
-    })
-      .formatToParts(new Date(utcGuess))
-      .map(({ type, value }) => [type, value]),
-  );
-  const asUtcMs = Date.UTC(
-    Number(parts.year),
-    Number(parts.month) - 1,
-    Number(parts.day),
-    Number(parts.hour),
-    Number(parts.minute),
-    Number(parts.second),
-  );
-
-  return utcGuess - (asUtcMs - utcGuess);
-}
-
-function isStaleReadDate(readDate, nowMs = Date.now()) {
-  return nowMs - parseCentralDateTimeToUtcMs(readDate) > MAX_DATA_AGE_MS;
+  try {
+    return JSON.parse(fs.readFileSync(OUTPUT_PATH, "utf8"));
+  } catch {
+    return null;
+  }
 }
 
 function parseLakeLevelCsv(text) {
@@ -155,10 +114,11 @@ async function main() {
     );
   }
 
-  // LCRA sometimes serves a cached LakeLevel.csv. Date Time is Central Time.
-  if (isStaleReadDate(readDate)) {
+  // LCRA sometimes serves a cached LakeLevel.csv. Both timestamps are Central Time.
+  const savedReadDate = readSavedSnapshot()?.readDate;
+  if (savedReadDate && readDate < savedReadDate) {
     console.log(
-      `Discarding stale Lake Travis data from ${readDate} Central Time (more than one day old).`,
+      `Discarding stale Lake Travis data from ${readDate}; saved snapshot is newer (${savedReadDate}).`,
     );
     return;
   }
