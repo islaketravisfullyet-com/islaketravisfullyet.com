@@ -20,16 +20,16 @@
 #     for more detailed explanations see http://waterdatafortexas.org/reservoirs/glossary
 # 
 # Estimated daily average data for Lake Travis
-#     generated: 2026-10-29T21:32:47.879156 UTC
-#     url: http://www.waterdatafortexas.org/reservoirs/individual/travis.csv
+#     generated: 2026-10-30T11:18:32.064076 UTC
+#     url: http://waterdatafortexas.org/reservoirs/individual/travis.csv
 # 
 # Footnote:
 #            
 #         
 # 
 # Elevation-Area-Capacity rating curve(s) used:
-#     http://www.waterdatafortexas.org/reservoirs/individual/travis/rating-curve/TWDB/2008-07-01
-#     http://www.waterdatafortexas.org/reservoirs/individual/travis/rating-curve/TWDB/2019-11-01
+#     http://waterdatafortexas.org/reservoirs/individual/travis/rating-curve/TWDB/2008-07-01
+#     http://waterdatafortexas.org/reservoirs/individual/travis/rating-curve/TWDB/2019-11-01
 # 
 # Conservation pool elevation(s) used:
 #     681.0 feet above NAVD88 +0.6
@@ -30750,4 +30750,5 @@ date,water_level,surface_area,reservoir_storage,conservation_storage,percent_ful
 2026-10-26,677.22,18178.43,1044746,1027714,93.6,1098044,17032
 2026-10-27,677.20,18173.94,1044382,1027350,93.6,1098044,17032
 2026-10-28,677.16,18164.85,1043656,1026624,93.5,1098044,17032
-2026-10-29,677.11,18153.26,1042748,1025716,93.4,1098044,17032
+2026-10-29,677.12,18155.59,1042929,1025897,93.4,1098044,17032
+2026-10-30,677.13,18157.92,1043111,1026079,93.4,1098044,17032
